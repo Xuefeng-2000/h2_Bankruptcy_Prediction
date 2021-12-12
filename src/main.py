@@ -1,11 +1,9 @@
 from scipy.io import arff
-
+import functools
 from io import StringIO
 import csv
 import pandas as pd
-
-c_path = r"../data/1year.csv"
-x_path = r"../data_excel/1year.xls"  # 路径中的xls文件在调用to_excel时会自动创建
+import numpy as np
 
 
 def csv_to_xls(csv_path, xls_path):
@@ -28,21 +26,117 @@ def csv_to_xls(csv_path, xls_path):
     writer.save()
 
 
-csv_to_xls(c_path, x_path)
+def cmp1(n1, n2):
+    if(n1[1] > n2[1]):
+        return -1
+    elif(n1[1] < n2[1]):
+        return 1
+    return 0
 
-file_name='../data/1year.arff'
+def profiling_miss(data):
+    len_d = len(data)
+    miss_num_attr = [0 for i in range(attr_len+1)]#第i号属性有多少空
+    miss_num_item = [0 for i in range(attr_len+1)]#空了i个属性的有多少条目
+    data_profiling = [[0.0 for i in range(64)] for j in range(2)]
+    data_attrNum = [[0 for i in range(64)] for j in range(2)]
 
-data,meta=arff.loadarff(file_name)
+    sum_haveMiss = 0
 
-print("==============Data_example=============")
-print(data[0])
+    cnt =0
+    for i in range(len_d):
+        data_tmp = list(data[i])
+        #print(data_tmp)
+        len_item = len(data_tmp)
+        data_tmp[-1] = int(data_tmp[-1])
 
-print("==================Meta=================")
-print(meta)
+        classid = data_tmp[-1]
+        cnt_miss = 0
+        for j in range(len_item-1):
+            if (np.isnan(data_tmp[j])):
+                cnt_miss = cnt_miss+1
+                miss_num_attr[j] = miss_num_attr[j] + 1
+            else:
+                data_profiling[classid][j] = data_profiling[classid][j] + data_tmp[j]
+                data_attrNum[classid][j] = data_attrNum[classid][j] + 1
+        miss_num_item[cnt_miss] = miss_num_item[cnt_miss] + 1
+        if(cnt_miss != 0):
+            sum_haveMiss = sum_haveMiss + 1
+        #cnt = cnt + 1
+        #if(cnt == 5):
+        #    break
 
-df=pd.DataFrame(data)
-out_file='../data/1year.csv'
-output=pd.DataFrame(df)
-output.to_csv(out_file,index=False)
 
-csv_to_xls(c_path,x_path)
+    sort_miss1 = []
+    idx = 0
+    for a in miss_num_item:
+        if idx == 0:
+            idx = idx+1
+            continue
+        sort_miss1.append([idx,a])
+        idx = idx + 1
+    sort_miss1 = sorted(sort_miss1, key=functools.cmp_to_key(cmp1))
+    print(sort_miss1) #缺i个的
+
+    sort_miss2 = []
+    idx = 0
+    for a in miss_num_attr:
+        sort_miss2.append([idx, a])
+        idx = idx + 1
+    sort_miss2 = sorted(sort_miss2, key=functools.cmp_to_key(cmp1))
+    print(sort_miss2)#缺i号的
+
+    #print(miss_num_item)
+    bigger_than4 = 0
+    for i in range(3,64): #缺3条以上的
+        bigger_than4 = bigger_than4 + sort_miss1[i][1]
+    print("There are %d (%.2f%%) items having missing data , %.2f%% Missing 3 attr at least !"%(sum_haveMiss,100*sum_haveMiss/len_d,100*bigger_than4/len_d))
+
+    cnt = 0
+    data_pro = []
+    for i in range(len_d): #数据填充
+
+        data_tmp = []
+        # print(data_tmp)
+        len_item = len(data[i])
+
+        classid = int(data[i][-1])
+        for j in range(len_item-1):
+            if j == 36: #删除36号元素
+                continue
+            if (np.isnan(data[i][j])): #无值填入同类别平均
+                data_tmp.append(data_profiling[classid][j]/data_attrNum[classid][j])
+            else: #有值填入原数值
+                data_tmp.append(data[i][j])
+        data_tmp.append(classid)
+
+        data_pro.append(tuple(data_tmp))
+
+    return data_pro
+
+
+if __name__ == '__main__':
+    file_id = 5
+    attr_len = 64
+
+    c_path = r"../processed_data/"+str(file_id)+"year.csv" #清洗结果路径
+    x_path = r"../data_excel/"+str(file_id)+"year.xls"  #excel路径
+    file_name='../data/'+str(file_id)+'year.arff'   #源文件路径
+
+    data,meta=arff.loadarff(file_name)
+
+    print("==============Data_Infomation=============")#打印数据集信息
+    len_d = len(data)
+
+    print("File_id : " + str(file_id))
+    print("Size : " + str(len_d) )
+    print("=================Data_Miss================")
+
+    data = profiling_miss(data)
+
+    df=pd.DataFrame(data)
+    out_file='../processed_data/'+str(file_id)+'year.csv'
+    output=pd.DataFrame(df)
+    output.to_csv(out_file,index=False)
+    print("============End of data cleaning==========")
+
+    #csv_to_xls(c_path,x_path)
