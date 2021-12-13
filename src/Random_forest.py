@@ -1,5 +1,5 @@
 import numpy as np
-import xgboost as xgb
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
 
 for year in range(1,6):
@@ -25,28 +25,11 @@ for year in range(1,6):
             X.append(feature)
             y.append(label)
 
-    dtrain = xgb.DMatrix(np.array(X), np.array(y))
 
-    num_round = 2000
-    params = {
-        'booster': 'gbtree',
-        'objective': 'binary:logistic',  # 多分类的问题
-        # 'num_class': 2,               # 类别数，与 multisoftmax 并用
-        'gamma': 0.1,                  # 用于控制是否后剪枝的参数,越大越保守，一般0.1、0.2这样子。
-        'max_depth': 12,               # 构建树的深度，越大越容易过拟合
-        'lambda': 2,                   # 控制模型复杂度的权重值的L2正则化项参数，参数越大，模型越不容易过拟合。
-        'subsample': 0.7,              # 随机采样训练样本
-        'colsample_bytree': 0.7,       # 生成树时进行的列采样
-        'min_child_weight': 3,
-        'verbosity':1,
-        'eta': 0.007,                  # 如同学习率
-        'seed': 1000,
-        'nthread': 4,                  # cpu 线程数
-        'eval_metric':'auc'
-    }
-    plst = params.items()
-
-    model = xgb.train(list(params.items()), dtrain, num_round)
+    model = RandomForestClassifier(n_estimators=100, 
+                               bootstrap = True,
+                               max_features = 'sqrt')
+    model.fit(X, y)
 
     right_num = 0
     total = 0
@@ -66,16 +49,14 @@ for year in range(1,6):
                 feature[i] = float(feature[i])
             label = temp[-1]
             y_true.append(int(label))
-            
-            dtest = xgb.DMatrix([feature])
-            y_pred = model.predict(dtest)
 
-            y_score.append(y_pred)
+            ans = model.predict([feature])
+            y_score.append(model.predict_proba([feature])[0][1])
 
-            if round(y_pred[0]) == int(label):
+            if ans[0] == label:
                 right_num += 1
             total += 1
-
+            
     print(f"{year}year:")        
     print("acc:",right_num / total)
     print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))

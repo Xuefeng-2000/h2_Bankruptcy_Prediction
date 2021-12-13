@@ -2,9 +2,9 @@ import numpy as np
 from sklearn import svm
 from sklearn.metrics import roc_auc_score
 
-for i in range(1,6):
-    enroll  = f'../data_split/enroll_{i}year.csv'
-    test = f'../data_split/test_{i}year.csv'
+for year in range(1,6):
+    enroll  = f'../data_split/enroll_{year}year.csv'
+    test = f'../data_split/test_{year}year.csv'
 
     X = []
     y = []
@@ -55,5 +55,7 @@ for i in range(1,6):
                 right_num += 1
             total += 1
             
-    print(right_num / total)
-    print(roc_auc_score(y_true = y_true, y_score=y_score))
+    print(f"{year}year:")        
+    print("acc:",right_num / total)
+    print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
+    print()
