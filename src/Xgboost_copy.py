@@ -196,6 +196,34 @@ def test_model(model_dir="../xgbmodels"):
 
 
 # train_model()
-test_model()
+# test_model()
+
+def valid_data(model_dir="../xgbmodels"):
+    for year in range(1,6):
+        print(f"\n\nyear {year}")
+        csv_file = f"{model_dir}/jitter_res_{year}year.csv"
+        df = pandas.read_csv(csv_file)
+        count = int(len(df)/63)
+
+        robost_data = []
+
+        for i in range(count):
+            data = df[i*63:i*63+63]
+            # print(data['ori']==data['jitter_value'])
+            jitter_value_change = 63 - sum(data['ori']==data['jitter_value'])
+            jitter_var_change = 63 - sum(data['ori']==data['jitter_var'])
+            robost_data.append((i, jitter_value_change, jitter_var_change))
+        robost = pandas.DataFrame(robost_data, columns=['id', 'weak_value', 'weak_var'])
+
+        print("%5s of %5s is robost         to value change"%(sum(robost['weak_value']==0),count))
+        print("%5s of %5s is lightly weak   to value change"%(sum(robost['weak_value']==1),count))
+        print("%5s of %5s is highly weak    to value change"%(sum(robost['weak_value'] >1),count))
+
+        print("%5s of %5s is robost         to var   change"%(sum(robost['weak_var']==0),count))
+        print("%5s of %5s is lightly weak   to var   change"%(sum(robost['weak_var']==1),count))
+        print("%5s of %5s is highly weak    to var   change"%(sum(robost['weak_var'] >1),count))
+
+
+valid_data()
         
         
