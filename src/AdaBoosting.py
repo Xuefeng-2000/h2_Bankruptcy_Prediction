@@ -1,3 +1,6 @@
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import  AdaBoostClassifier
+
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
@@ -26,7 +29,7 @@ for year in range(1, 6):
             X.append(feature)
             y.append(label)
 
-    model = LogisticRegression(max_iter=10000)
+    model = AdaBoostClassifier()
     model.fit(X, y)
 
     right_num = 0
