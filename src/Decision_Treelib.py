@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
-from sklearn.linear_model import LogisticRegression
 from sklearn import tree
 for year in range(1, 6):
     enroll = f'../data_split/enroll_{year}year.csv'
@@ -26,7 +25,7 @@ for year in range(1, 6):
             X.append(feature)
             y.append(label)
 
-    model = LogisticRegression(max_iter=10000)
+    model = tree.DecisionTreeClassifier(criterion='entropy',splitter='best',max_depth=64)
     model.fit(X, y)
 
     right_num = 0

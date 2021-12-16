@@ -1,6 +1,12 @@
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import  AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 import numpy as np
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn import tree
 for year in range(1, 6):
@@ -26,7 +32,7 @@ for year in range(1, 6):
             X.append(feature)
             y.append(label)
 
-    model = LogisticRegression(max_iter=10000)
+    model = MultinomialNB(alpha=0.01)
     model.fit(X, y)
 
     right_num = 0
