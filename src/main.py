@@ -42,6 +42,9 @@ def profiling_miss(data):
 
     sum_haveMiss = 0
 
+    num_0 = 0
+    num_1 = 0
+
     cnt =0
     for i in range(len_d):
         data_tmp = list(data[i])
@@ -50,6 +53,8 @@ def profiling_miss(data):
         data_tmp[-1] = int(data_tmp[-1])
 
         classid = data_tmp[-1]
+        num_0 = num_0+1 if classid == 0 else num_0+0
+        num_1 = num_1+1 if classid == 1 else num_1+0
         cnt_miss = 0
         for j in range(len_item-1):
             if (np.isnan(data_tmp[j])):
@@ -64,7 +69,11 @@ def profiling_miss(data):
         #cnt = cnt + 1
         #if(cnt == 5):
         #    break
-
+    print("====Before pre : ====")
+    print("num_0 : %d"%(num_0) )
+    print("num_1 : %d"%(num_1) )
+    print("precent_0 : %.2f" % (100.0*num_0/(num_0 + num_1)))
+    print("precent_1 : %.2f" % (100.0*num_1/(num_0 + num_1) ))
 
     sort_miss1 = []
     idx = 0
@@ -90,9 +99,12 @@ def profiling_miss(data):
     for i in range(3,64): #缺3条以上的
         bigger_than4 = bigger_than4 + sort_miss1[i][1]
     print("There are %d (%.2f%%) items having missing data , %.2f%% Missing 3 attr at least !"%(sum_haveMiss,100*sum_haveMiss/len_d,100*bigger_than4/len_d))
-
+    print(bigger_than4)
     cnt = 0
     data_pro = []
+
+    num_0 = 0
+    num_1 = 0
     for i in range(len_d): #数据填充
 
         data_tmp = []
@@ -100,6 +112,14 @@ def profiling_miss(data):
         len_item = len(data[i])
 
         classid = int(data[i][-1])
+        sum_nan = 0
+        for j in range(len_item - 1):
+            if (np.isnan(data[i][j])):
+                sum_nan = sum_nan + 1
+        if(sum_nan >=4):
+            continue
+        num_0 = num_0 + 1 if classid == 0 else num_0 + 0
+        num_1 = num_1 + 1 if classid == 1 else num_1 + 0
         for j in range(len_item-1):
             if j == 36: #删除36号元素
                 continue
@@ -110,33 +130,40 @@ def profiling_miss(data):
         data_tmp.append(classid)
 
         data_pro.append(tuple(data_tmp))
+    print("====After pre : ====")
+    print("num_0 : %d" % (num_0))
+    print("num_1 : %d" % (num_1))
+    print("precent_0 : %.2f" % (100.0 * num_0 / (num_0 + num_1)))
+    print("precent_1 : %.2f" % (100.0 * num_1 / (num_0 + num_1)))
+    print("sum : %d"%(num_0+num_1))
 
     return data_pro
 
 
 if __name__ == '__main__':
-    file_id = 5
-    attr_len = 64
+    for file_id in range(1,6):
 
-    c_path = r"../processed_data/"+str(file_id)+"year.csv" #清洗结果路径
-    x_path = r"../data_excel/"+str(file_id)+"year.xls"  #excel路径
-    file_name='../data/'+str(file_id)+'year.arff'   #源文件路径
+        attr_len = 64
 
-    data,meta=arff.loadarff(file_name)
+        c_path = r"../processed_data/"+str(file_id)+"year.csv" #清洗结果路径
+        x_path = r"../data_excel/"+str(file_id)+"year.xls"  #excel路径
+        file_name='../data/'+str(file_id)+'year.arff'   #源文件路径
 
-    print("==============Data_Infomation=============")#打印数据集信息
-    len_d = len(data)
+        data,meta=arff.loadarff(file_name)
 
-    print("File_id : " + str(file_id))
-    print("Size : " + str(len_d) )
-    print("=================Data_Miss================")
+        print("==============Data_Infomation=============")#打印数据集信息
+        len_d = len(data)
 
-    data = profiling_miss(data)
+        print("File_id : " + str(file_id))
+        print("Size : " + str(len_d) )
+        print("=================Data_Miss================")
 
-    df=pd.DataFrame(data)
-    out_file='../processed_data/'+str(file_id)+'year.csv'
-    output=pd.DataFrame(df)
-    output.to_csv(out_file,index=False)
-    print("============End of data cleaning==========")
+        data = profiling_miss(data)
 
-    #csv_to_xls(c_path,x_path)
+        df=pd.DataFrame(data)
+        out_file='../processed_data/'+str(file_id)+'year.csv'
+        output=pd.DataFrame(df)
+        output.to_csv(out_file,index=False)
+        print("============End of data cleaning==========")
+
+        #csv_to_xls(c_path,x_path)
