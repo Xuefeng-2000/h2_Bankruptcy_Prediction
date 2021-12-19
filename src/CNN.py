@@ -5,6 +5,7 @@ from torch.utils.data import TensorDataset
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import sklearn
 import torch.optim as optim
 from torchvision import transforms
 from torchvision import datasets
@@ -34,6 +35,12 @@ def Macro_average(Precision, Recall):
     print("\nF1 Macro_average :%.6f" % (F1))
 
 
+fig, ax = plt.subplots()
+x = []
+Y = []
+res = 0
+point_cnt = 0
+
 # loss 可视化
 def vision_loss(pt_y):
     global point_cnt
@@ -41,9 +48,11 @@ def vision_loss(pt_y):
     global x, y
     x.append(point_cnt)
     point_cnt = point_cnt + 1
-    y.append(pt_y)
+#    print(pt_y,"*********")
+    Y.append(pt_y)
+
     ax.cla()
-    ax.plot(x, y, 'r', lw=1)
+    ax.plot(x, Y, 'r', lw=1)
     plt.pause(0.0001)
 
 
@@ -129,13 +138,9 @@ else:
     print("========================RNN======================")
     model = RNN()
 
-optimizer = optim.SGD(model.parameters(), lr=0.0001)
+optimizer = optim.SGD(model.parameters(), lr=0.00001)
 
-fig, ax = plt.subplots()
-x = []
-y = []
-res = 0
-point_cnt = 0
+
 
 
 
@@ -151,15 +156,13 @@ def train(epoch,train_loader):
 
         loss = nn.CrossEntropyLoss()(output, target)
         #pt_y = loss.tolist()
-        # print(pt_y)
-        # vision_loss(pt_y) #loss收敛可视化
+        #print(pt_y)
+        #vision_loss((pt_y) ) #loss收敛可视化
 
         loss.backward()
         optimizer.step()
-        if batch_idx % 100 == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                       100. * batch_idx / len(train_loader), loss.item()))
+        #if batch_idx % 100 == 0:
+            #print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(epoch, batch_idx * len(data), len(train_loader.dataset),100. * batch_idx / len(train_loader), loss.item()))
 
 
 
@@ -213,14 +216,14 @@ def test(ite,test_loader):
         Precision[i] = 0 if (TP[i] + FP[i]) == 0 else 1.0 * TP[i] / (TP[i] + FP[i])
         Recall[i] = 0 if (TP[i] + FN[i]) == 0 else 1.0 * TP[i] / (TP[i] + FN[i])
 
-    print("==============Epoch:%2d Test Result==============" % (ite))
-    Macro_average(Precision, Recall)
+    #print("==============Epoch:%2d Test Result==============" % (ite))
+    #Macro_average(Precision, Recall)
 
     sum_loss /= len(test_loader.dataset)
-    print('\nAverage loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
-        sum_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
-    print("=================================================\n")
+    #print('\nAverage loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
+        #sum_loss, correct, len(test_loader.dataset),
+        #100. * correct / len(test_loader.dataset)))
+    #print("=================================================\n")
 
     right_num = 0
     total = 0
@@ -237,10 +240,11 @@ def test(ite,test_loader):
     print(f"{year}year:")
     print("acc:", right_num / total)
     print("auc:", roc_auc_score(y_true=y_true, y_score=y_score))
+    print("f1: ", sklearn.metrics.f1_score(y_true, y_score))
     print()
 
 
-for year in range(1, 2):
+for year in range(1, 6):
     print(year )
     enroll = f'../data_split/enroll_{year}year.csv'
     test_f = f'../data_split/test_{year}year.csv'
@@ -265,7 +269,7 @@ for year in range(1, 2):
                 feature[i] = float(feature[i])
             label = int(temp[-1])
             if(label == 1):
-                for kk in range(9):
+                for kk in range(16):
                     X.append(feature)
                     y.append(label)
 
@@ -308,7 +312,6 @@ for year in range(1, 2):
 
             test_x.append(feature)
             test_y.append(label)
-    print("***" + str(len(test_x)))
     data_tensor = torch.Tensor(test_x)
     target_tensor = torch.tensor(test_y,dtype = torch.long)
 
@@ -318,14 +321,14 @@ for year in range(1, 2):
         batch_size=BATCH_SIZE, shuffle=True)
 
     time_sum = 0
-    for epoch in range(1, 2):
+    for epoch in range(1, 7):
         st = time.time()
         train(epoch,train_loader)
         ed = time.time()
         time_sum += int(ed) - int(st)
     test(1,test_loader)
 
-    print("%s Time cost : %10d s" % (sys.argv[1], time_sum))
+   # print("%s Time cost : %10d s" % (sys.argv[1], time_sum))
 
 
-    print()
+   # print()

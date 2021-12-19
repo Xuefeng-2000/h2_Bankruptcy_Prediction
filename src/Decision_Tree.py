@@ -1,5 +1,6 @@
 
 from sklearn.metrics import roc_auc_score
+import sklearn
 
 def gini_score(groups, classes):
     '''
@@ -80,7 +81,7 @@ def get_split(group):
             sort_list.append(group[k][i])
         sort_list = sorted(sort_list)
         tem_split_values = []#list(set([row[i] for row in group]))
-        for k in range(0,len_g,5):
+        for k in range(0,len_g,20):
             tem_split_values.append(sort_list[k])
         for split_value in tem_split_values:
             groups = split_group(i, split_value, group)
@@ -212,4 +213,5 @@ for year in range(1, 6):
     print(f"{year}year:")
     print("acc:", right_num / total)
     print("auc:", roc_auc_score(y_true=y_true, y_score=y_score))
+    print("f1: ", sklearn.metrics.f1_score(y_true, y_score))
     print()
