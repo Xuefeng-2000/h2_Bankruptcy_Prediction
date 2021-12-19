@@ -3,7 +3,9 @@ import numpy as np
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
 from matplotlib import pyplot as plt
+import sklearn
 
+num_round = 2000
 for year in range(1,6):
     enroll  = f'../data_split/enroll_{year}year.csv'
     valid = f'../data_split/valid_{year}year.csv'
@@ -30,7 +32,8 @@ for year in range(1,6):
 
     dtrain = xgb.DMatrix(np.array(X), np.array(y))
 
-    num_round = 2000
+    
+    # num_round = 2000
     params = {
         'booster': 'gbtree',
         'objective': 'binary:logistic',  # 多分类的问题
@@ -56,6 +59,7 @@ for year in range(1,6):
 
     y_true = [] # 真实标签
     y_score = [] # 预测得分
+    y_predlist = []
     with open(test) as lines:
         for id,data in enumerate(lines):
             if id == 0:
@@ -74,7 +78,7 @@ for year in range(1,6):
             y_pred = model.predict(dtest)
 
             y_score.append(y_pred)
-
+            y_predlist.append(round(y_pred[0]))
             if round(y_pred[0]) == int(label):
                 right_num += 1
             total += 1
@@ -82,34 +86,35 @@ for year in range(1,6):
     print(f"{year}year:")        
     print("acc:",right_num / total)
     print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
+    print("F1:",sklearn.metrics.f1_score(y_true, y_predlist))
     print()
 
-    ans = model.get_fscore()
-    sort_result = sorted(ans.items(), key=lambda x: x[1], reverse=True)
-    feature_list = []
-    feature_score_list = []
-    for i in sort_result:
-        print(i[0],":",i[1])
-        feature_list.append(i[0])
-        feature_score_list.append(i[1])
+    # ans = model.get_fscore()
+    # sort_result = sorted(ans.items(), key=lambda x: x[1], reverse=True)
+    # feature_list = []
+    # feature_score_list = []
+    # for i in sort_result:
+    #     print(i[0],":",i[1])
+    #     feature_list.append(i[0])
+    #     feature_score_list.append(i[1])
         
-    x = np.arange(len(feature_list))
-    plt.bar(x, feature_score_list, color='orange', width=0.5)
-    params = {
-        'figure.figsize': '15, 4'
-    }
-    plt.rcParams.update(params)
-    plt.title(f'{year}_xgboost_importance')
-    plt.xlabel('type')
-    plt.ylabel('importance')
-    plt.xticks(x, feature_list ,fontsize = 5)
+    # x = np.arange(len(feature_list))
+    # plt.bar(x, feature_score_list, color='orange', width=0.5)
+    # params = {
+    #     'figure.figsize': '15, 4'
+    # }
+    # plt.rcParams.update(params)
+    # plt.title(f'{year}_xgboost_importance')
+    # plt.xlabel('type')
+    # plt.ylabel('importance')
+    # plt.xticks(x, feature_list ,fontsize = 5)
 
-    for p,q in enumerate(feature_score_list):
-        plt.text(p - 0.5, q + 50 ,q,va='center',fontsize=4)
-    plt.savefig(f"../fig/{year}_xgboost_importance.png", dpi=700)
-    plt.show()
+    # for p,q in enumerate(feature_score_list):
+    #     plt.text(p - 0.5, q + 50 ,q,va='center',fontsize=4)
+    # plt.savefig(f"../fig/{year}_xgboost_importance.png", dpi=700)
+    # plt.show()
 
-    plt.close()
+    # plt.close()
 
 
 
