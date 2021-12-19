@@ -1,6 +1,8 @@
+#%%
 import numpy as np
 import xgboost as xgb
 from sklearn.metrics import roc_auc_score
+from matplotlib import pyplot as plt
 
 for year in range(1,6):
     enroll  = f'../data_split/enroll_{year}year.csv'
@@ -80,3 +82,33 @@ for year in range(1,6):
     print("acc:",right_num / total)
     print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
     print()
+
+    ans = model.get_fscore()
+    sort_result = sorted(ans.items(), key=lambda x: x[1], reverse=True)
+    feature_list = []
+    feature_score_list = []
+    for i in sort_result:
+        print(i[0],":",i[1])
+        feature_list.append(i[0])
+        feature_score_list.append(i[1])
+        
+    x = np.arange(len(feature_list))
+    plt.bar(x, feature_score_list, color='orange', width=0.5)
+    params = {
+        'figure.figsize': '15, 4'
+    }
+    plt.rcParams.update(params)
+    plt.title(f'{year}_xgboost_importance')
+    plt.xlabel('type')
+    plt.ylabel('importance')
+    plt.xticks(x, feature_list ,fontsize = 5)
+
+    for p,q in enumerate(feature_score_list):
+        plt.text(p - 0.5, q + 50 ,q,va='center',fontsize=4)
+    plt.savefig(f"../fig/{year}_xgboost_importance.png", dpi=700)
+    plt.show()
+
+    plt.close()
+
+
+
