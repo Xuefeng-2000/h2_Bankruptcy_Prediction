@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 
 for year in range(1,6):
     enroll  = f'../data_split/enroll_{year}year.csv'
+    valid = f'../data_split/valid_{year}year.csv'
     test = f'../data_split/test_{year}year.csv'
 
     X = []
