@@ -7,9 +7,9 @@ import sklearn
 
 num_round = 2000
 for year in range(1,6):
-    enroll  = f'../data_split2/enroll_{year}year.csv'
-    valid = f'../data_split2/valid_{year}year.csv'
-    test = f'../data_split2/test_{year}year.csv'
+    enroll  = f'../new_data_split/enroll_{year}year.csv'
+    valid = f'../new_data_split/valid_{year}year.csv'
+    test = f'../new_data_split/test_{year}year.csv'
 
     X = []
     y = []
@@ -20,7 +20,7 @@ for year in range(1,6):
                 continue
 
             temp = data.strip().split(",")
-            feature = [temp[20]]
+            feature = temp[:-1]
             length = len(feature)
 
             for i in range(length):
@@ -69,7 +69,7 @@ for year in range(1,6):
                 continue
 
             temp = data.strip().split(",")
-            feature = [temp[20]]
+            feature = temp[:-1]
             length = len(feature)
 
             for i in range(length):
