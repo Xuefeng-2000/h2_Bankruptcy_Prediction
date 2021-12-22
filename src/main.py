@@ -123,8 +123,8 @@ def profiling_miss(data):
         for j in range(len_item-1):
             if j == 36: #删除36号元素
                 continue
-            if (np.isnan(data[i][j])): #无值填入同类别平均
-                data_tmp.append(data_profiling[classid][j]/data_attrNum[classid][j])
+            if (np.isnan(data[i][j])): #无值填入平均
+                data_tmp.append( (data_profiling[0][j]+data_profiling[0][j])/(data_attrNum[0][j] + data_attrNum[1][j]))
             else: #有值填入原数值
                 data_tmp.append(data[i][j])
         data_tmp.append(classid)

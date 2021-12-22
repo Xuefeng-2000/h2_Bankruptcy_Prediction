@@ -82,6 +82,6 @@ for year in range(1, 6):
 
     #print(f"{year}year:")
     #print("%.2lf%%"%(100.0*round(right_num / total ,4)))
-    print("%.4lf"%( round(roc_auc_score(y_true=y_true, y_score=y_score),4)))
-    #print("f1: ", sklearn.metrics.f1_score(y_true, y_pred))
+    #print("%.4lf"%( round(roc_auc_score(y_true=y_true, y_score=y_score),4)))
+    print(sklearn.metrics.f1_score(y_true, y_pred))
     #print()

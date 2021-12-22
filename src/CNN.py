@@ -68,7 +68,9 @@ class CNN(nn.Module):
         self.fc1 = nn.Linear(63, 256)  # 全链接
         self.re = nn.ReLU()
         self.fc2 = nn.Linear(256, 128)  # 全链接
-        self.fc3 = nn.Linear(128, 2)  # 全链接
+        self.fc3 = nn.Linear(128, 128)  # 全链接
+        self.fc4 = nn.Linear(128, 2)  # 全链接
+        self.fc5 = nn.Linear(128, 2)  # 全链接
 
     def forward(self, x):
         # batch_size = 64
@@ -80,7 +82,9 @@ class CNN(nn.Module):
         #print(x)
         x = self.re(self.fc1(x))  # x: 64*10
         x = self.re(self.fc2(x))  # x: 64*10
-        x = self.fc3(x)  # x: 64*10
+        x = self.re(self.fc3(x))  # x: 64*10
+        x = self.re(self.fc3(x))  # x: 64*10
+        x = self.fc5(x)  # x: 64*10
         #x = self.fc3(x)  # x: 64*10
         #print(x)
         return F.log_softmax(x, dim=1)
