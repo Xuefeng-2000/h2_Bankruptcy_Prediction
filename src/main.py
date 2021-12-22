@@ -3,6 +3,7 @@ import functools
 from io import StringIO
 import csv
 import pandas as pd
+import random
 import numpy as np
 
 
@@ -124,7 +125,11 @@ def profiling_miss(data):
             if j == 36: #删除36号元素
                 continue
             if (np.isnan(data[i][j])): #无值填入平均
-                data_tmp.append( (data_profiling[0][j]+data_profiling[0][j])/(data_attrNum[0][j] + data_attrNum[1][j]))
+                rd = random.random()
+                rd = rd % 10
+                rd = rd - 10
+                kk = 100 - rd
+                data_tmp.append( kk/100*(data_profiling[0][j]+data_profiling[0][j])/(data_attrNum[0][j] + data_attrNum[1][j]))
             else: #有值填入原数值
                 data_tmp.append(data[i][j])
         data_tmp.append(classid)
