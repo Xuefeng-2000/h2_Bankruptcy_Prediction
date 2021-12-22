@@ -23,7 +23,7 @@ for year in range(1, 6):
                 continue
 
             temp = data.strip().split(",")
-            feature = temp[:-1]
+            feature = temp[:20] + temp[21:-1]
             length = len(feature)
 
             for i in range(length):
@@ -48,7 +48,7 @@ for year in range(1, 6):
                 continue
 
             temp = data.strip().split(",")
-            feature = temp[:-1]
+            feature = temp[:20] + temp[21:-1]
             length = len(feature)
 
             for i in range(length):

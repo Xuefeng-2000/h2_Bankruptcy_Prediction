@@ -1,11 +1,11 @@
 import random
 
 random.seed(20211213)
-for i in range(1,6):
-    source = f'../processed_data/{i}year.csv'
-    enroll = f'../new_data_split/enroll_{i}year.csv'
-    valid = f'../new_data_split/valid_{i}year.csv'
-    test = f'../new_data_split/test_{i}year.csv'
+for year in range(1,6):
+    source = f'../processed_data/{year}year.csv'
+    enroll = f'../new_data_split/enroll_{year}year.csv'
+    valid = f'../new_data_split/valid_{year}year.csv'
+    test = f'../new_data_split/test_{year}year.csv'
     enroll_list_1 = []
     enroll_list_0 = []
 
@@ -17,6 +17,10 @@ for i in range(1,6):
                 continue
 
             label = i.strip().split(",")[-1]
+            if year < 3:
+                temp = i.strip().split(",")
+                i = ','.join(temp[:20] + temp[21:])
+                i += '\n'
             if label == "1":
                 enroll_list_1.append(i)
             else:

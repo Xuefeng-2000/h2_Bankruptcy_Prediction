@@ -114,10 +114,11 @@ for year in range(1,6):
     #     feature_score_list.append(i[1])
         
     # x = np.arange(len(feature_list))
-    # plt.bar(x, feature_score_list, color='orange', width=0.5)
+    
     # params = {
     #     'figure.figsize': '15, 4'
     # }
+    # plt.bar(x, feature_score_list, color='orange', width=0.5)
     # plt.rcParams.update(params)
     # plt.title(f'{year}_xgboost_importance')
     # plt.xlabel('type')
