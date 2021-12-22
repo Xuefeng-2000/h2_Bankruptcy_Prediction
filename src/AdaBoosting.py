@@ -1,3 +1,4 @@
+#%%
 from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.ensemble import  AdaBoostClassifier
 
@@ -7,9 +8,11 @@ from sklearn.metrics import roc_auc_score
 from sklearn.linear_model import LogisticRegression
 from sklearn import tree
 import sklearn
+
 for year in range(1, 6):
-    enroll = f'../data_split/enroll_{year}year.csv'
-    test = f'../data_split/test_{year}year.csv'
+    enroll = f'../data_split2/enroll_{year}year.csv'
+    valid = f'../data_split2/valid_{year}year.csv'
+    test = f'../data_split2/test_{year}year.csv'
 
     X = []
     y = []
@@ -30,7 +33,7 @@ for year in range(1, 6):
             X.append(feature)
             y.append(label)
 
-    model = AdaBoostClassifier()
+    model = AdaBoostClassifier(random_state=1000)
     model.fit(X, y)
 
     right_num = 0

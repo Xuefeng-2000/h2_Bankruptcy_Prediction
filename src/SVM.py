@@ -2,60 +2,64 @@ import numpy as np
 from sklearn import svm
 from sklearn.metrics import roc_auc_score
 
-for year in range(1,6):
-    enroll  = f'../data_split/enroll_{year}year.csv'
-    test = f'../data_split/test_{year}year.csv'
+for C in [0.01,0.1,1,10,100,1000,10000]:
+    for degree in [1,3,5]:
+        for gamma in [0.1,0.5,0.7]:
+            print(C,degree,gamma)
+            for year in range(1,6):
+                enroll  = f'../data_split/enroll_{year}year.csv'
+                test = f'../data_split/test_{year}year.csv'
 
-    X = []
-    y = []
+                X = []
+                y = []
 
-    with open(enroll) as lines:
-        for id,data in enumerate(lines):
-            if id == 0:
-                continue
+                with open(enroll) as lines:
+                    for id,data in enumerate(lines):
+                        if id == 0:
+                            continue
 
-            temp = data.strip().split(",")
-            feature = temp[:-1]
-            length = len(feature)
+                        temp = data.strip().split(",")
+                        feature = temp[:-1]
+                        length = len(feature)
 
-            for i in range(length):
-                feature[i] = float(feature[i])
-            label = temp[-1]
+                        for i in range(length):
+                            feature[i] = float(feature[i])
+                        label = temp[-1]
 
-            X.append(feature)
-            y.append(label)
+                        X.append(feature)
+                        y.append(label)
 
 
-    clf = svm.SVC(class_weight='balanced')
-    clf.fit(X, y)
+                clf = svm.SVC(C=C,gamma = gamma,degree=degree,class_weight='balanced')
+                clf.fit(X, y)
 
-    right_num = 0
-    total = 0
+                right_num = 0
+                total = 0
 
-    y_true = [] # 真实标签
-    y_score = [] # 预测得分
-    with open(test) as lines:
-        for id,data in enumerate(lines):
-            if id == 0:
-                continue
+                y_true = [] # 真实标签
+                y_score = [] # 预测得分
+                with open(test) as lines:
+                    for id,data in enumerate(lines):
+                        if id == 0:
+                            continue
 
-            temp = data.strip().split(",")
-            feature = temp[:-1]
-            length = len(feature)
+                        temp = data.strip().split(",")
+                        feature = temp[:-1]
+                        length = len(feature)
 
-            for i in range(length):
-                feature[i] = float(feature[i])
-            label = temp[-1]
-            y_true.append(int(label))
+                        for i in range(length):
+                            feature[i] = float(feature[i])
+                        label = temp[-1]
+                        y_true.append(int(label))
 
-            ans = clf.predict([feature])
-            y_score.append(clf.decision_function([feature]))
+                        ans = clf.predict([feature])
+                        y_score.append(clf.decision_function([feature]))
 
-            if ans[0] == label:
-                right_num += 1
-            total += 1
-            
-    print(f"{year}year:")        
-    print("acc:",right_num / total)
-    print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
-    print()
+                        if ans[0] == label:
+                            right_num += 1
+                        total += 1
+                        
+                print(f"{year}year:")        
+                print("acc:",right_num / total)
+                print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
+                print()

@@ -3,9 +3,9 @@ import random
 random.seed(20211213)
 for i in range(1,6):
     source = f'../processed_data/{i}year.csv'
-    enroll = f'../data_split2/enroll_{i}year.csv'
-    valid = f'../data_split2/valid_{i}year.csv'
-    test = f'../data_split2/test_{i}year.csv'
+    enroll = f'../new_data_split/enroll_{i}year.csv'
+    valid = f'../new_data_split/valid_{i}year.csv'
+    test = f'../new_data_split/test_{i}year.csv'
     enroll_list_1 = []
     enroll_list_0 = []
 
@@ -30,8 +30,8 @@ for i in range(1,6):
         for id,i in enumerate(enroll_list_0):
             if id < num_0:
                 enroll_writer.write(i)
-            # elif id < num_1:
-            #     valid_writer.write(i)
+            elif id < num_1:
+                valid_writer.write(i)
             else:
                 test_writer.write(i)
 
@@ -40,7 +40,7 @@ for i in range(1,6):
         for id,i in enumerate(enroll_list_1):
             if id < num_0:
                 enroll_writer.write(i)
-            # elif id < num_1:
-            #     valid_writer.write(i)
+            elif id < num_1:
+                valid_writer.write(i)
             else:
                 test_writer.write(i)

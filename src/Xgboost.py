@@ -7,9 +7,9 @@ import sklearn
 
 num_round = 2000
 for year in range(1,6):
-    enroll  = f'../data_split/enroll_{year}year.csv'
-    valid = f'../data_split/valid_{year}year.csv'
-    test = f'../data_split/test_{year}year.csv'
+    enroll  = f'../data_split2/enroll_{year}year.csv'
+    valid = f'../data_split2/valid_{year}year.csv'
+    test = f'../data_split2/test_{year}year.csv'
 
     X = []
     y = []
@@ -20,7 +20,7 @@ for year in range(1,6):
                 continue
 
             temp = data.strip().split(",")
-            feature = temp[:-1]
+            feature = [temp[20]]
             length = len(feature)
 
             for i in range(length):
@@ -60,13 +60,16 @@ for year in range(1,6):
     y_true = [] # 真实标签
     y_score = [] # 预测得分
     y_predlist = []
+    TP = 0
+    FN = 0
+    num_1 = 0
     with open(test) as lines:
         for id,data in enumerate(lines):
             if id == 0:
                 continue
 
             temp = data.strip().split(",")
-            feature = temp[:-1]
+            feature = [temp[20]]
             length = len(feature)
 
             for i in range(length):
@@ -81,12 +84,24 @@ for year in range(1,6):
             y_predlist.append(round(y_pred[0]))
             if round(y_pred[0]) == int(label):
                 right_num += 1
+            if round(y_pred[0]) == 1 and int(label) == 1:
+                TP += 1
+            if round(y_pred[0]) == 0 and int(label) == 1:
+                FN += 1
+            if round(y_pred[0]) == 1:
+                num_1 += 1
             total += 1
+
 
     print(f"{year}year:")        
     print("acc:",right_num / total)
     print("auc:",roc_auc_score(y_true = y_true, y_score=y_score))
     print("F1:",sklearn.metrics.f1_score(y_true, y_predlist))
+    print("precision:",sklearn.metrics.precision_score(y_true, y_predlist))
+    print("recall:",sklearn.metrics.recall_score(y_true, y_predlist))
+    print(TP/(TP+FN))
+    print(f"TP:{TP},FN:{FN}")
+    print(f"num_1:{num_1},total:{total}")
     print()
 
     # ans = model.get_fscore()
@@ -111,7 +126,7 @@ for year in range(1,6):
 
     # for p,q in enumerate(feature_score_list):
     #     plt.text(p - 0.5, q + 50 ,q,va='center',fontsize=4)
-    # plt.savefig(f"../fig/{year}_xgboost_importance.png", dpi=700)
+    # plt.savefig(f"../fic/{year}_xgboost_importance.png", dpi=700)
     # plt.show()
 
     # plt.close()
